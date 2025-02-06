@@ -26,8 +26,6 @@ function App() {
             <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
-        <br />
-        <br />
         {isAuthenticated && <Taskbar setIsAuthenticated={setIsAuthenticated} />}
       </div>
     </Router>

@@ -1,11 +1,12 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaHome, FaQrcode, FaListAlt, FaShieldAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaUserAlt, FaQrcode, FaListAlt, FaShieldAlt, FaUser, FaSignOutAlt } from "react-icons/fa";
 import "../styles/Taskbar.css";
 
 export default function Taskbar({ setIsAuthenticated }) {
   const navigate = useNavigate();
-  const isAuthenticated = !!localStorage.getItem("user");
+  const user = JSON.parse(localStorage.getItem("user"));
+  const isAuthenticated = !!user
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -16,14 +17,14 @@ export default function Taskbar({ setIsAuthenticated }) {
   return (
     <nav className="taskbar">
       <ul className="taskbar-menu">
-        <li className="taskbar-item">
-          <Link to="/" className="taskbar-link">
-            <FaHome className="taskbar-icon" />
-            <span>Home</span>
-          </Link>
-        </li>
         {isAuthenticated && (
           <>
+            <li className="taskbar-item welcome-text">
+              <div className="taskbar-link">
+                <FaUserAlt className="taskbar-icon" />
+                <span>{user.name}</span>
+              </div>
+            </li>
             <li className="taskbar-item">
               <Link to="/scan" className="taskbar-link">
                 <FaQrcode className="taskbar-icon" />
@@ -48,7 +49,7 @@ export default function Taskbar({ setIsAuthenticated }) {
                 <span>Profile</span>
               </Link>
             </li>
-            <li className="taskbar-item">
+            <li className="taskbar-item logout">
               <button onClick={handleLogout} className="taskbar-link">
                 <FaSignOutAlt className="taskbar-icon" />
                 <span>Logout</span>

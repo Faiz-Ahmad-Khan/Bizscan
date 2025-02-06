@@ -1,61 +1,88 @@
 .taskbar {
   position: fixed;
-  bottom: 0;  /* Keep it at the bottom */
+  top: 0;
   width: 100%;
-  background-color: darkblue;  /* Blue background */
+  background-color: darkblue;
   color: white;
-  border-top: 2px solid darkblue; /* Slight border effect */
+  border-bottom: 2px solid darkblue;
   display: flex;
   justify-content: center;
   padding: 10px 0;
-  z-index: 1000; /* Stay above other elements */
+  z-index: 1000;
 }
 
-.taskbar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* Center both icon and text */
-  text-align: center;
-  font-size: 16px !important; /* Adjust text size */
-  width: 100px; /* Ensures equal spacing */
+/* Welcome text on the left corner */
+.welcome-text {
+  font-size: 16px;
+  font-weight: bold;
+  margin-right: auto;
+  padding-left: 20px; /* Spacing from the left */
+  color: white;
 }
 
-.taskbar-icon {
-  font-size: 28px !important; /* Increase icon size */
-  display: block;
-  margin-bottom: 6px; /* Space between icon and text */
-  text-align: center;
-}
-
+/* Taskbar Menu */
 .taskbar-menu {
   display: flex;
-  justify-content: space-around;
   align-items: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 900px;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* Navigation Items */
 .taskbar-item {
-  color: white !important; /* Ensures text stays white */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 16px !important;
+  padding: 10px;
+  color: white !important;
 }
 
+/* Logout Button - Shift to Right Corner */
+.taskbar-item.logout {
+  margin-left: auto; /* Push Logout to the far right */
+  padding-right: 20px; /* Add some spacing from the right */
+}
+
+/* Button Styles */
+.taskbar-item button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 10px;
+}
+
+/* Icons */
 .taskbar-icon {
-  color: white !important; /* Ensures icons stay white */
+  font-size: 28px !important;
+  display: block;
+  margin-bottom: 6px;
+  color: white !important;
 }
 
+/* Links */
 .taskbar-item a {
-  color: white !important; /* Ensures links stay white */
+  color: white !important;
   text-decoration: none;
 }
 
+/* Hover Effect */
 .taskbar-item:hover {
-  color: black !important; /* Turns black only on hover */
+  color: black !important;
 }
 
 .taskbar-item:hover .taskbar-icon {
   color: black !important;
+}
+
+/* Prevent content from hiding under the Taskbar */
+body {
+  padding-top: 60px;
 }
