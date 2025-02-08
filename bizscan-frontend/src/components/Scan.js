@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "../styles/Scan.css";
 
 const Scan = () => {
   const [qrCode, setQrCode] = useState(null);
-  const navigate = useNavigate();
   
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));

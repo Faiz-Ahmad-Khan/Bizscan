@@ -43,21 +43,6 @@
     min-height: 80px;
 }
 
-.profile-form button {
-    background-color: darkblue;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-.profile-form button:hover {
-    background-color: black;
-}
-
 .profile-images {
     display: flex;
     flex-direction: column;
@@ -74,32 +59,99 @@
     border: 2px solid darkblue;
 }
 
-.header-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
+.carousel-container, .services-container {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
     border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-entry {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.service-entry {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    position: relative;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    align-items: center;
+}
+
+.carousel-entry img, .service-entry img {
+    width: 100px;
+    height: 100px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+}
+
+.service-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.service-details textarea {
+    margin-top: 5px;
+    width: 100%;
+    border-radius: 5px;
+}
+
+.delete-icon {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.delete-icon:hover {
+    background: darkred;
 }
 
 .button-group {
     display: flex;
-    gap: 10px;
+    justify-content: space-between;
     margin-top: 10px;
+}
+
+.update-button {
+    background-color: darkblue;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 5px;
 }
 
 .cancel-button {
     background-color: red;
     color: white;
     border: none;
-    padding: 8px 16px;
+    padding: 10px 16px;
     cursor: pointer;
-}
-
-.qr-button {
-    margin-top: 10px;
-    background-color: darkblue;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
+    border-radius: 5px;
 }

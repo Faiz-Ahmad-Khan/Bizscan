@@ -1,5 +1,7 @@
 package com.bizscan.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,8 +16,9 @@ public class User {
     private String email;
     private String password;
     private String profileImage;
-    private String headerImage;
     private String description;
     private String location;
     private String phoneNo;
+    private List<String> carousels;
+    private List<Service> services;
 }
