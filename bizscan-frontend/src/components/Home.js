@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-scroll";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/Home.css";
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
@@ -62,6 +64,10 @@ export default function Home({ setIsAuthenticated }) {
       question: "Is BizScan free to use?",
       answer: "Yes, BizScan offers a free version for users. Future premium features may be introduced.",
     },
+    {
+      question: "Can I customize my QR code?",
+      answer: "Yes, BizScan allows you to customize the design of your QR code with different colors and styles to match your branding.",
+    }
   ];
 
   const handleSubmit = async (e) => {
@@ -89,7 +95,7 @@ export default function Home({ setIsAuthenticated }) {
       navigate("/profile");
     } catch (error) {
       console.error("Authentication Error:", error);
-      alert(error.message);
+      toast.error(error.message);
       setFormData({ name: "", email: "", password: "" });
     }
   };

@@ -13,8 +13,8 @@ export default function Taskbar({ setIsAuthenticated }) {
     setIsAuthenticated(false);
     navigate("/");
   };
-
-  return (
+  
+return (
     <nav className="taskbar">
       <ul className="taskbar-menu">
         {isAuthenticated && (
@@ -24,6 +24,12 @@ export default function Taskbar({ setIsAuthenticated }) {
                 <FaUserAlt className="taskbar-icon" />
                 <span>{user.name}</span>
               </div>
+            </li>
+            <li className="taskbar-item">
+              <Link to="/profile" className="taskbar-link">
+                <FaUser className="taskbar-icon" />
+                <span>Profile</span>
+              </Link>
             </li>
             <li className="taskbar-item">
               <Link to="/scan" className="taskbar-link">
@@ -41,12 +47,6 @@ export default function Taskbar({ setIsAuthenticated }) {
               <Link to="/security" className="taskbar-link">
                 <FaShieldAlt className="taskbar-icon" />
                 <span>Security</span>
-              </Link>
-            </li>
-            <li className="taskbar-item">
-              <Link to="/profile" className="taskbar-link">
-                <FaUser className="taskbar-icon" />
-                <span>Profile</span>
               </Link>
             </li>
             <li className="taskbar-item logout">

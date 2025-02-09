@@ -4,7 +4,6 @@ import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import styles from "../styles/Dashboard.module.css";
 
 const Dashboard = () => {
@@ -12,7 +11,6 @@ const Dashboard = () => {
   const location = useLocation();
   const [profile, setProfile] = useState(null);
   const [coordinates, setCoordinates] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("id");
@@ -63,23 +61,12 @@ const Dashboard = () => {
     }
   };
 
-  const images = [profile?.carousel1, profile?.carousel2, profile?.carousel3].filter(Boolean);
-
-  const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-  };
-
   if (!profile) {
     return <div className={styles.dashboardContainer}>Loading profile...</div>;
   }
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* Sidebar Navigation */}
       <nav className={styles.sidebar}>
         {profile.profileImage && (
           <img
@@ -106,25 +93,18 @@ const Dashboard = () => {
       </nav>
 
       <div className={styles.mainContent}>
-        <section id="home" className={styles.homeSection}>
+      <section id="home" className={styles.homeSection}>
           <h1 className={styles.homeProfileName}>{profile.name} says Hi!</h1>
-          {images.length > 0 && (
-            <div className={styles.carouselContainer}>
-              <button className={styles.carouselButton} onClick={prevImage}><FaChevronLeft /></button>
-              <img
-                src={`http://localhost:8080/uploads/${images[currentImageIndex]}`}
-                alt="Carousel"
-                className={styles.carouselImage}
-              />
-              <button className={styles.carouselButton} onClick={nextImage}><FaChevronRight /></button>
-              <div className={styles.carouselIndicators}>
-                {images.map((_, index) => (
-                  <span
-                    key={index}
-                    className={index === currentImageIndex ? styles.activeIndicator : styles.indicator}
-                  ></span>
-                ))}
-              </div>
+          {profile.carousels && profile.carousels.length > 0 && (
+            <div className={styles.carouselGrid}>
+              {profile.carousels.map((image, index) => (
+                <img
+                  key={index}
+                  src={`http://localhost:8080/uploads/${image}`}
+                  alt={`Carousel ${index + 1}`}
+                  className={styles.carouselImage}
+                />
+              ))}
             </div>
           )}
         </section>

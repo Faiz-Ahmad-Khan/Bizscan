@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/Security.css";
 
 const Security = () => {
@@ -11,7 +13,6 @@ const Security = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -26,28 +27,28 @@ const Security = () => {
 
   const handleEmailChange = async () => {
     if (!email) {
-      alert("Email cannot be empty.");
+      toast.warn("Email cannot be empty.");
       return;
     }
     try {
       await axios.put(`http://localhost:8080/profile/${profile.id}/change-email`, { email });
-      alert("Email updated successfully.");
+      toast.success("Email updated successfully.");
       setOldEmail(email);
     } catch (error) {
       console.error("Error updating email:", error);
-      alert("Failed to update email.");
+      toast.error("Failed to update email.");
       setEmail(oldEmail);
     }
   };
 
   const handlePasswordChange = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
-      setPasswordError("All fields are required.");
+      toast.error("All fields are required.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError("New password and confirm password do not match.");
+      toast.error("New password and confirm password do not match.");
       return;
     }
     try {
@@ -57,15 +58,14 @@ const Security = () => {
       });
 
       if (response.status === 200) {
-        alert("Password updated successfully.");
+        toast.success("Password updated successfully.");
         setOldPassword("");
         setNewPassword("");
         setConfirmPassword("");
-        setPasswordError("");
       }
     } catch (error) {
       console.error("Error updating password:", error);
-      setPasswordError("Old password is incorrect.");
+      toast.error("Old password is incorrect.");
     }
   };
 
@@ -73,11 +73,11 @@ const Security = () => {
     try {
       await axios.delete(`http://localhost:8080/profile/${profile.id}`);
       localStorage.removeItem("user");
-      alert("Account deleted successfully.");
+      toast.success("Account deleted successfully.");
       navigate("/");
     } catch (error) {
       console.error("Error deleting profile:", error);
-      alert("Failed to delete profile.");
+      toast.error("Failed to delete profile.");
     }
   };
 
@@ -120,13 +120,9 @@ const Security = () => {
           type="password"
           placeholder="Confirm new password"
           value={confirmPassword}
-          onChange={(e) => {
-            setConfirmPassword(e.target.value);
-            setPasswordError(e.target.value !== newPassword ? "Passwords do not match" : "");
-          }}
+          onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
-        {passwordError && <p className="error-message">{passwordError}</p>}
         <button className="update-button" onClick={handlePasswordChange}>
           Update Password
         </button>

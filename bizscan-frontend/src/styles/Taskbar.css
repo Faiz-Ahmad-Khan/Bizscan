@@ -1,3 +1,4 @@
+/* Taskbar Styles */
 .taskbar {
   position: fixed;
   top: 0;
@@ -11,15 +12,6 @@
   z-index: 1000;
 }
 
-/* Welcome text on the left corner */
-.welcome-text {
-  font-size: 16px;
-  font-weight: bold;
-  margin-right: auto;
-  padding-left: 20px; /* Spacing from the left */
-  color: white;
-}
-
 /* Taskbar Menu */
 .taskbar-menu {
   display: flex;
@@ -31,55 +23,54 @@
   margin: 0;
 }
 
-/* Navigation Items */
+/* Taskbar Items */
 .taskbar-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
-  font-size: 16px !important;
+  font-size: 16px;
   padding: 10px;
-  color: white !important;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
 }
 
-/* Logout Button - Shift to Right Corner */
-.taskbar-item.logout {
-  margin-left: auto; /* Push Logout to the far right */
-  padding-right: 20px; /* Add some spacing from the right */
+/* Welcome Text */
+.welcome-text {
+  font-weight: bold;
+  margin-right: auto;
+  padding-left: 20px;
 }
 
-/* Button Styles */
-.taskbar-item button {
+/* Logout Button - Positioned to Right */
+.logout {
+  margin-left: auto;
+  padding-right: 20px;
+}
+
+/* Buttons & Links */
+.taskbar-item button, .taskbar-item a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: none;
   border: none;
   color: inherit;
   font-size: 1rem;
   cursor: pointer;
-  padding: 10px;
+  text-decoration: none;
 }
 
 /* Icons */
 .taskbar-icon {
-  font-size: 28px !important;
-  display: block;
+  font-size: 28px;
   margin-bottom: 6px;
-  color: white !important;
 }
 
-/* Links */
-.taskbar-item a {
-  color: white !important;
-  text-decoration: none;
-}
-
-/* Hover Effect */
-.taskbar-item:hover {
-  color: black !important;
-}
-
-.taskbar-item:hover .taskbar-icon {
-  color: black !important;
+/* Hover Effects */
+.taskbar-item:hover, .taskbar-item:hover .taskbar-icon {
+  color: black;
 }
 
 /* Prevent content from hiding under the Taskbar */

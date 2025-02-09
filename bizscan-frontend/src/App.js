@@ -6,6 +6,8 @@ import Scan from "./components/Scan";
 import Dashboard from "./components/DashBoard";
 import Security from "./components/Security";
 import Profile from "./components/Profile";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -27,6 +29,7 @@ function App() {
           </Routes>
         </div>
         {isAuthenticated && <Taskbar setIsAuthenticated={setIsAuthenticated} />}
+        <ToastContainer position="top-center" autoClose={2000} />
       </div>
     </Router>
   );

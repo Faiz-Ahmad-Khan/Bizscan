@@ -29,7 +29,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.bizscan.model.Service;
 import com.bizscan.model.User;
 import com.bizscan.repository.UserRepository;
 
@@ -46,86 +45,70 @@ class ProfileController {
 	}
 
 	@PutMapping("/{id}")
-	public User updateProfile(
-	        @PathVariable String id,
-	        @RequestParam("name") String name,
-	        @RequestParam("description") String description,
-	        @RequestParam("location") String location,
-	        @RequestParam("phoneNo") String phoneNo,
-	        @RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-	        @RequestParam(value = "carouselImages", required = false) List<MultipartFile> carouselImages,
-	        @RequestParam(value = "serviceImages", required = false) List<MultipartFile> serviceImages,
-	        @RequestParam(value = "serviceDescriptions", required = false) List<String> serviceDescriptions) {
+	public User updateProfile(@PathVariable String id, @RequestParam("name") String name,
+			@RequestParam("description") String description, @RequestParam("location") String location,
+			@RequestParam("phoneNo") String phoneNo,
+			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
+			@RequestParam(value = "carouselImages", required = false) List<MultipartFile> carouselImages) {
 
-	    return userRepository.findById(id).map(user -> {
-	        user.setName(name);
-	        user.setDescription(description);
-	        user.setLocation(location);
-	        user.setPhoneNo(phoneNo);
+		return userRepository.findById(id).map(user -> {
+			user.setName(name);
+			user.setDescription(description);
+			user.setLocation(location);
+			user.setPhoneNo(phoneNo);
 
-	        String uploadDir = "uploads/";
+			String uploadDir = "uploads/";
 
-	        try {
-	            if (profileImage != null && !profileImage.isEmpty()) {
-	            	String profileImageName = user.getName().replaceAll("\\s+", "_") +
-	            			"_pfp" + getFileExtension(profileImage);
-	                Path profileImagePath = Paths.get(uploadDir + profileImageName);
-	                Files.write(profileImagePath, profileImage.getBytes());
-	                user.setProfileImage(profileImageName);
-	            }
+			try {
+				if (profileImage != null && !profileImage.isEmpty()) {
+					String profileImageName = user.getName().replaceAll("\\s+", "_") + "_pfp"
+							+ getFileExtension(profileImage);
+					Path profileImagePath = Paths.get(uploadDir + profileImageName);
+					Files.write(profileImagePath, profileImage.getBytes());
+					user.setProfileImage(profileImageName);
+				}
 
-	            if (carouselImages != null && !carouselImages.isEmpty()) {
-	                List<String> carouselImageNames = new ArrayList<>();
-	                for (int i = 0; i < carouselImages.size(); i++) {
-	                	MultipartFile carouselImage = carouselImages.get(i);
-	                    if (carouselImage != null && !carouselImage.isEmpty()) {
-	                    	String carouselImageName = user.getName().replaceAll("\\s+", "_") +
-	                    			"_carousel_" + (i + 1) + getFileExtension(carouselImage);
-	                        Path carouselImagePath = Paths.get(uploadDir + carouselImageName);
-	                        Files.write(carouselImagePath, carouselImage.getBytes());
-	                        carouselImageNames.add(carouselImageName);
-	                    }
-	                }
-	                user.setCarousels(carouselImageNames);
-	            }
+				if (carouselImages != null && !carouselImages.isEmpty()) {
+					List<String> carouselImageNames = new ArrayList<>(user.getCarousels());
+					for (MultipartFile carouselImage : carouselImages) {
+						if (!carouselImage.isEmpty()) {
+							String carouselImageName = user.getName().replaceAll("\\s+", "_") + "_carousel_"
+									+ (carouselImageNames.size() + 1) + getFileExtension(carouselImage);
+							Path carouselImagePath = Paths.get(uploadDir + carouselImageName);
+							Files.write(carouselImagePath, carouselImage.getBytes());
+							carouselImageNames.add(carouselImageName);
+						}
+					}
+					user.setCarousels(carouselImageNames);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException("Image upload failed", e);
+			}
 
-	            if (serviceImages != null && serviceDescriptions != null && serviceImages.size() == serviceDescriptions.size()) {
-	                List<Service> services = new ArrayList<>();
-	                for (int i = 0; i < serviceImages.size(); i++) {
-	                    MultipartFile serviceImage = serviceImages.get(i);
-	                    String serviceDescription = serviceDescriptions.get(i);
-
-	                    if (serviceImage != null && !serviceImage.isEmpty()) {
-	                    	String serviceImageName = user.getName().replaceAll("\\s+", "_") +
-	                    			"_service_" + (i + 1) + getFileExtension(serviceImage);
-	                        Path serviceImagePath = Paths.get(uploadDir + serviceImageName);
-	                        Files.write(serviceImagePath, serviceImage.getBytes());
-
-	                        Service service = new Service();
-	                        service.setImageUrl(serviceImageName);
-	                        service.setDescription(serviceDescription);
-	                        services.add(service);
-	                    }
-	                }
-	                user.setServices(services);
-	            }
-
-	        } catch (Exception e) {
-	            throw new RuntimeException("Image upload failed", e);
-	        }
-
-	        return userRepository.save(user);
-	    }).orElseThrow(() -> new RuntimeException("User not found"));
+			return userRepository.save(user);
+		}).orElseThrow(() -> new RuntimeException("User not found"));
 	}
-	
+
+	@DeleteMapping("/{id}/carousel/{index}")
+	public User deleteCarouselImage(@PathVariable String id, @PathVariable int index) {
+		return userRepository.findById(id).map(user -> {
+			List<String> carousels = user.getCarousels();
+			if (index >= 0 && index < carousels.size()) {
+				carousels.remove(index);
+				user.setCarousels(carousels);
+				userRepository.save(user);
+			}
+			return user;
+		}).orElseThrow(() -> new RuntimeException("User not found"));
+	}
+
 	private String getFileExtension(MultipartFile file) {
-	    String originalFilename = file.getOriginalFilename();
-	    if (originalFilename != null && originalFilename.contains(".")) {
-	        return originalFilename.substring(originalFilename.lastIndexOf("."));
-	    }
-	    return "";
+		String originalFilename = file.getOriginalFilename();
+		if (originalFilename != null && originalFilename.contains(".")) {
+			return originalFilename.substring(originalFilename.lastIndexOf("."));
+		}
+		return "";
 	}
-
 
 	@PutMapping("/{id}/change-email")
 	public ResponseEntity<String> changeEmail(@PathVariable String id, @RequestBody Map<String, String> request) {
@@ -147,72 +130,29 @@ class ProfileController {
 			return ResponseEntity.ok("Password updated successfully");
 		}).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found"));
 	}
-	
+
 	@GetMapping("/{id}/qrcode")
-    public ResponseEntity<byte[]> generateQRCode(@PathVariable String id) {
-        try {
-            String qrContent = "http://localhost:3000/dashboard?id=" + id;
-            int width = 300;
-            int height = 300;
-            
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(qrContent, BarcodeFormat.QR_CODE, width, height);
-            
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
-            
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_PNG)
-                    .body(baos.toByteArray());
-            
-        } catch (WriterException | IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
+	public ResponseEntity<byte[]> generateQRCode(@PathVariable String id) {
+		try {
+			String qrContent = "http://localhost:3000/dashboard?id=" + id;
+			int width = 300;
+			int height = 300;
+
+			QRCodeWriter qrCodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = qrCodeWriter.encode(qrContent, BarcodeFormat.QR_CODE, width, height);
+
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
+
+			return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(baos.toByteArray());
+
+		} catch (WriterException | IOException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+		}
+	}
 
 	@DeleteMapping("/{id}")
 	public void deleteProfile(@PathVariable String id) {
 		userRepository.deleteById(id);
 	}
-	
-	@DeleteMapping("/{id}/carousel/{index}")
-	public User deleteCarouselImage(@PathVariable String id, @PathVariable int index) {
-	    return userRepository.findById(id).map(user -> {
-	        if (user.getCarousels() != null && index >= 0 && index < user.getCarousels().size()) {
-	            String fileName = user.getCarousels().get(index);
-	            Path filePath = Paths.get("uploads/" + fileName);
-
-	            try {
-	                Files.deleteIfExists(filePath);
-	            } catch (IOException e) {
-	                throw new RuntimeException("Failed to delete image", e);
-	            }
-
-	            user.getCarousels().remove(index);
-	            return userRepository.save(user);
-	        }
-	        throw new RuntimeException("Invalid carousel image index");
-	    }).orElseThrow(() -> new RuntimeException("User not found"));
-	}
-	
-	@DeleteMapping("/{id}/service/{index}")
-	public User deleteService(@PathVariable String id, @PathVariable int index) {
-	    return userRepository.findById(id).map(user -> {
-	        if (user.getServices() != null && index >= 0 && index < user.getServices().size()) {
-	            Service service = user.getServices().get(index);
-	            Path filePath = Paths.get("uploads/" + service.getImageUrl());
-
-	            try {
-	                Files.deleteIfExists(filePath);
-	            } catch (IOException e) {
-	                throw new RuntimeException("Failed to delete service image", e);
-	            }
-
-	            user.getServices().remove(index);
-	            return userRepository.save(user);
-	        }
-	        throw new RuntimeException("Invalid service index");
-	    }).orElseThrow(() -> new RuntimeException("User not found"));
-	}
-
 }
