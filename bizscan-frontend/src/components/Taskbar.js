@@ -22,7 +22,7 @@ return (
             <li className="taskbar-item welcome-text">
               <div className="taskbar-link">
                 <FaUserAlt className="taskbar-icon" />
-                <span>{user.name}</span>
+                <span className="user-name">{user.name}</span>
               </div>
             </li>
             <li className="taskbar-item">

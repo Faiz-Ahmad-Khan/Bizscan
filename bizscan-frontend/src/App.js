@@ -14,8 +14,15 @@ function App() {
 
   useEffect(() => {
     const user = localStorage.getItem("user");
+    if (isAuthenticated) {
+      document.body.classList.add("with-taskbar");
+      document.body.classList.remove("no-taskbar");
+    } else {
+      document.body.classList.add("no-taskbar");
+      document.body.classList.remove("with-taskbar");
+    }
     setIsAuthenticated(!!user);
-  }, []);
+  }, [isAuthenticated]);
   return (
     <Router>
       <div className="app-container">

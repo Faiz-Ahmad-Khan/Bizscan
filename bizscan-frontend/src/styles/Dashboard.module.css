@@ -20,6 +20,7 @@
 }
 
 .sidebarProfileImage {
+  margin-top: 100px;
   width: 130px;
   height: 130px;
   border-radius: 50%;
@@ -59,7 +60,7 @@
 
 /* Main Content */
 .mainContent {
-  margin-left: 250px;
+  margin-left: 200px;
   padding: 20px;
   width: calc(100% - 250px);
   overflow-y: auto;
@@ -70,7 +71,7 @@
   text-align: center;
   height: auto;
   padding: 40px;
-  margin-top: 0;
+  margin-top: 20px;
   border-radius: 10px;
   scroll-margin-top: 0;
 }
@@ -97,12 +98,11 @@
   color: #333;
 }
 
-/* About Section */
 .aboutSection,
 .projectsSection,
 .contactSection {
-  height: auto;
-  padding: 80px 40px;
+  height: 400px;
+  padding: 80px 40px; /* Same padding for About and Projects sections */
   text-align: center;
   background-color: #f9f9f9;
   border-bottom: 1px solid #e0e0e0;
@@ -110,11 +110,23 @@
   scroll-margin-top: 0;
 }
 
+/* Ensure all section headers have consistent styling */
 .aboutSection h2,
 .projectsSection h2,
 .contactSection h2 {
   color: #1c1c1c;
 }
+
+.contactSection {
+  height: auto;
+  padding: 80px 40px; /* Same padding for About and Projects sections */
+  text-align: center;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+  border-radius: 10px;
+  scroll-margin-top: 0;
+}
+
 
 /* Map Container */
 .mapContainer {
@@ -143,4 +155,12 @@
   margin: 30px auto;
   text-align: center;
   transition: 0.3s ease;
+}
+
+.customPin {
+  font-size: 40px;
+  text-align: center;
+  line-height: 1;
+  width: 100px;
+  height: 100px;
 }

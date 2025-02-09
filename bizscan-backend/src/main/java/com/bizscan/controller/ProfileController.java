@@ -29,6 +29,7 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.bizscan.model.Service;
 import com.bizscan.model.User;
 import com.bizscan.repository.UserRepository;
 
@@ -49,7 +50,9 @@ class ProfileController {
 			@RequestParam("description") String description, @RequestParam("location") String location,
 			@RequestParam("phoneNo") String phoneNo,
 			@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-			@RequestParam(value = "carouselImages", required = false) List<MultipartFile> carouselImages) {
+			@RequestParam(value = "carouselImages", required = false) List<MultipartFile> carouselImages,
+			@RequestParam(value = "serviceImages", required = false) List<MultipartFile> serviceImages,
+	        @RequestParam(value = "serviceDescriptions", required = false) List<String> serviceDescriptions) {
 
 		return userRepository.findById(id).map(user -> {
 			user.setName(name);
@@ -69,7 +72,8 @@ class ProfileController {
 				}
 
 				if (carouselImages != null && !carouselImages.isEmpty()) {
-					List<String> carouselImageNames = new ArrayList<>(user.getCarousels());
+					List<String> carouselImageNames = user.getCarousels() != null ?
+							new ArrayList<>(user.getCarousels()) : new ArrayList<>();
 					for (MultipartFile carouselImage : carouselImages) {
 						if (!carouselImage.isEmpty()) {
 							String carouselImageName = user.getName().replaceAll("\\s+", "_") + "_carousel_"
@@ -81,6 +85,26 @@ class ProfileController {
 					}
 					user.setCarousels(carouselImageNames);
 				}
+				
+				if (serviceImages != null && serviceDescriptions != null && serviceImages.size() == serviceDescriptions.size()) {
+	                List<Service> services = new ArrayList<>();
+	                for (int i = 0; i < serviceImages.size(); i++) {
+	                    MultipartFile serviceImage = serviceImages.get(i);
+	                    String serviceDescription = serviceDescriptions.get(i);
+	                    if (serviceImage != null && !serviceImage.isEmpty()) {
+	                    	String serviceImageName = user.getName().replaceAll("\\s+", "_") +
+	                    			"_service_" + (i + 1) + getFileExtension(serviceImage);
+	                        Path serviceImagePath = Paths.get(uploadDir + serviceImageName);
+	                        Files.write(serviceImagePath, serviceImage.getBytes());
+	                        Service service = new Service();
+	                        service.setImageUrl(serviceImageName);
+	                        service.setDescription(serviceDescription);
+	                        services.add(service);
+	                    }
+	                }
+	                user.setServices(services);
+	            }
+				
 			} catch (Exception e) {
 				throw new RuntimeException("Image upload failed", e);
 			}
@@ -100,6 +124,24 @@ class ProfileController {
 			}
 			return user;
 		}).orElseThrow(() -> new RuntimeException("User not found"));
+	}
+	
+	@DeleteMapping("/{id}/service/{index}")
+	public User deleteService(@PathVariable String id, @PathVariable int index) {
+	    return userRepository.findById(id).map(user -> {
+	        if (user.getServices() != null && index >= 0 && index < user.getServices().size()) {
+	            Service service = user.getServices().get(index);
+	            Path filePath = Paths.get("uploads/" + service.getImageUrl());
+	            try {
+	                Files.deleteIfExists(filePath);
+	            } catch (IOException e) {
+	                throw new RuntimeException("Failed to delete service image", e);
+	            }
+	            user.getServices().remove(index);
+	            return userRepository.save(user);
+	        }
+	        throw new RuntimeException("Invalid service index");
+	    }).orElseThrow(() -> new RuntimeException("User not found"));
 	}
 
 	private String getFileExtension(MultipartFile file) {

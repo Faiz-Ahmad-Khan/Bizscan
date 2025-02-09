@@ -15,11 +15,14 @@ const Profile = () => {
     description: "",
     location: "",
     phoneNo: "",
-    carousels: []
+    carousels: [],
+    services: []
   });
 
   const [profileImageFile, setProfileImageFile] = useState(null);
   const [carouselFiles, setCarouselFiles] = useState([]);
+  const [serviceFiles, setServiceFiles] = useState([]);
+  const [serviceDescriptions, setServiceDescriptions] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -32,9 +35,12 @@ const Profile = () => {
         location: storedUser.location || "",
         phoneNo: storedUser.phoneNo || "",
         profileImage: storedUser.profileImage || "",
-        carousels: storedUser.carousels || []
+        carousels: storedUser.carousels || [],
+        services: storedUser.services || []
       });
       setCarouselFiles(new Array(storedUser.carousels?.length || 0).fill(null));
+      setServiceFiles(new Array(storedUser.services?.length || 0).fill(null));
+      setServiceDescriptions(storedUser.services ? storedUser.services.map(service => service.description || "") : []);
     }
   }, []);
 
@@ -49,6 +55,10 @@ const Profile = () => {
         const updatedCarouselFiles = [...carouselFiles];
         updatedCarouselFiles[index] = file;
         setCarouselFiles(updatedCarouselFiles);
+      } else if (type === "service") {
+        const updatedServiceFiles = [...serviceFiles];
+        updatedServiceFiles[index] = file;
+        setServiceFiles(updatedServiceFiles);
       } else {
         setProfileImageFile(file);
       }
@@ -77,6 +87,34 @@ const Profile = () => {
     }
   };
 
+  const handleServiceChange = (e, index) => {
+    const updatedServiceDescriptions = [...serviceDescriptions];
+    updatedServiceDescriptions[index] = e.target.value || "";
+    setServiceDescriptions(updatedServiceDescriptions);
+  };
+  const addService = () => {
+    setProfile({ ...profile, services: [...profile.services, {}] });
+    setServiceFiles([...serviceFiles, null]);
+    setServiceDescriptions([...serviceDescriptions, ""]);
+  };
+  const deleteService = async (index) => {
+    try {
+      const response = await axios.delete(`http://localhost:8080/profile/${profile.id}/service/${index}`);
+      setProfile((prevProfile) => ({
+      ...prevProfile,
+      services: response.data.services || [] 
+    }));
+  
+      setServiceFiles((prev) => prev.filter((_, i) => i !== index));
+      setServiceDescriptions((prev) => prev.filter((_, i) => i !== index));
+  
+      toast.success("Service deleted successfully");
+    } catch (error) {
+      console.error("Error deleting service", error);
+      toast.error("Failed to delete service");
+    }
+  };  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -90,6 +128,11 @@ const Profile = () => {
 
     carouselFiles.forEach((file) => {
       if (file) formData.append("carouselImages", file);
+    });
+
+    serviceFiles.forEach((file, index) => {
+      if (file) formData.append("serviceImages", file);
+      formData.append("serviceDescriptions", serviceDescriptions[index] || "");
     });
 
     try {
@@ -106,7 +149,7 @@ const Profile = () => {
       console.error("Error updating profile", error);
       toast.error("Failed to update profile");
     }
-};
+  };
 
   const handleCancel = () => {
     navigate("/dashboard");
@@ -163,6 +206,28 @@ const Profile = () => {
         ))}
         <button type="button" className="carousel-button" onClick={addCarousel}>
           {profile.carousels.length === 0 ? "Add an Image" : "Add Another Image"}
+        </button>
+
+        <label>Services:</label>
+        {profile.services && profile.services.map((service, index) => (
+          <div key={index} className="service-entry">
+            <label>Service Image:</label>
+            {service.imageUrl  && (
+              <img 
+                src={`http://localhost:8080/uploads/${service.imageUrl }`} 
+                alt={`Service ${index + 1}`} 
+                width="100" 
+                height="100"
+              />
+            )}
+            <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, index, "service")} className="service-input"/>
+            <label>Service Description:</label>
+            <textarea value={serviceDescriptions[index] || ""} onChange={(e) => handleServiceChange(e, index)} />
+            <button type="button" onClick={() => deleteService(index)}>Delete</button>
+          </div>
+        ))}
+        <button type="button" className="service-button" onClick={addService}>
+          {profile.services.length === 0 ? "Add a Service" : "Add Another Service"}
         </button>
 
         <div className="button-group">
