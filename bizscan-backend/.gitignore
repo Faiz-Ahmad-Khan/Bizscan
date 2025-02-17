@@ -66,7 +66,7 @@ Thumbs.db
 uploads/
 
 # Ignore application.properties
-bizscan-backend/src/main/resources/application.properties
+/src/main/resources/application.properties
 
 # Ignore Maven wrapper files (optional, keep only if needed)
 /mvnw
