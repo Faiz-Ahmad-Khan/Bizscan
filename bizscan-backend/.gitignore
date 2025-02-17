@@ -67,8 +67,3 @@ uploads/
 
 # Ignore application.properties
 /src/main/resources/application.properties
-
-# Ignore Maven wrapper files (optional, keep only if needed)
-/mvnw
-/mvnw.cmd
-.mvn/
