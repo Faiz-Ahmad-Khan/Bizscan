@@ -65,5 +65,3 @@ Thumbs.db
 # Uploads (if dynamically created at runtime)
 uploads/
 
-# Ignore application.properties
-/src/main/resources/application.properties
