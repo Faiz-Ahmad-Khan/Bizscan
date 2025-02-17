@@ -53,7 +53,7 @@ class ProfileController {
 			@RequestParam(value = "carouselImages", required = false) List<MultipartFile> carouselImages,
 			@RequestParam(value = "serviceImages", required = false) List<MultipartFile> serviceImages,
 	        @RequestParam(value = "serviceDescriptions", required = false) List<String> serviceDescriptions) {
-
+		
 		return userRepository.findById(id).map(user -> {
 			user.setName(name);
 			user.setDescription(description);
@@ -86,24 +86,31 @@ class ProfileController {
 					user.setCarousels(carouselImageNames);
 				}
 				
-				if (serviceImages != null && serviceDescriptions != null && serviceImages.size() == serviceDescriptions.size()) {
-	                List<Service> services = new ArrayList<>();
-	                for (int i = 0; i < serviceImages.size(); i++) {
-	                    MultipartFile serviceImage = serviceImages.get(i);
-	                    String serviceDescription = serviceDescriptions.get(i);
-	                    if (serviceImage != null && !serviceImage.isEmpty()) {
-	                    	String serviceImageName = user.getName().replaceAll("\\s+", "_") +
-	                    			"_service_" + (i + 1) + getFileExtension(serviceImage);
-	                        Path serviceImagePath = Paths.get(uploadDir + serviceImageName);
-	                        Files.write(serviceImagePath, serviceImage.getBytes());
-	                        Service service = new Service();
-	                        service.setImageUrl(serviceImageName);
-	                        service.setDescription(serviceDescription);
-	                        services.add(service);
-	                    }
-	                }
-	                user.setServices(services);
-	            }
+				if (serviceDescriptions != null) {  // Check if descriptions exist
+					List<Service> updatedServices = new ArrayList<>(Optional.ofNullable(user.getServices()).orElse(new ArrayList<>()));
+
+				    for (int i = 0; i < serviceDescriptions.size(); i++) {
+				        Service service;
+				        if (i < updatedServices.size()) {
+				            service = updatedServices.get(i);
+				        } else {
+				            service = new Service();
+				            updatedServices.add(service);
+				        }
+
+				        service.setDescription(serviceDescriptions.get(i)); // Always update description
+
+				        if (serviceImages != null && i < serviceImages.size() && !serviceImages.get(i).isEmpty()) {
+				            MultipartFile serviceImage = serviceImages.get(i);
+				            String serviceImageName = user.getName().replaceAll("\\s+", "_") + "_service_" + (i + 1) + getFileExtension(serviceImage);
+				            Path serviceImagePath = Paths.get(uploadDir + serviceImageName);
+				            Files.write(serviceImagePath, serviceImage.getBytes());
+				            service.setImageUrl(serviceImageName);
+				        }
+				    }
+
+				    user.setServices(updatedServices);
+				}
 				
 			} catch (Exception e) {
 				throw new RuntimeException("Image upload failed", e);

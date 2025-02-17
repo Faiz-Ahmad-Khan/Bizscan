@@ -12,6 +12,15 @@ const Dashboard = () => {
   const [profile, setProfile] = useState(null);
   const [coordinates, setCoordinates] = useState(null);
   const [activeSection, setActiveSection] = useState("home");
+  const [selectedService, setSelectedService] = useState(null);
+
+  const openPopup = (service) => {
+    setSelectedService(service);
+  };
+
+  const closePopup = () => {
+    setSelectedService(null);
+  };
 
   const queryParams = new URLSearchParams(location.search);
   const userId = queryParams.get("id");
@@ -130,26 +139,46 @@ const Dashboard = () => {
         )}
         {activeSection === "projects" && (
           <section id="projects" className={styles.projectsSection}>
-            <h2>My Projects</h2>
-            {profile.services && profile.services.length > 0 ? (
-            <div className={styles.servicesList}>
+          <h2>Services</h2>
+          {profile.services && profile.services.length > 0 ? (
+            <div className={styles.servicesGrid}>
               {profile.services.map((service, index) => (
-                <div key={index} className={styles.serviceItem}>
-                  <p>{service.description}</p>
+                <div
+                  key={index}
+                  className={styles.serviceItem}
+                  onClick={() => openPopup(service)}
+                >
                   {service.imageUrl && (
                     <img
                       src={`http://localhost:8080/uploads/${service.imageUrl}`}
-                      alt={`Service ${index + 1}`} 
+                      alt={`Service ${index + 1}`}
                       className={styles.serviceImage}
                     />
                   )}
+                  <p className={styles.overlayText}>Service {index + 1}</p>
                 </div>
               ))}
             </div>
           ) : (
-            <p>No services available.</p>
+            <p style={{ color: 'black' }}>No services available.</p>
           )}
-          </section>
+    
+          {selectedService && (
+            <div className={styles.popup}>
+              <div className={styles.popupContent}>
+                <button className={styles.closeButton} onClick={closePopup}>
+                  &times;
+                </button>
+                <img
+                  src={`http://localhost:8080/uploads/${selectedService.imageUrl}`}
+                  alt="Selected Service"
+                  className={styles.popupImage}
+                />
+                <p>{selectedService.description}</p>
+              </div>
+            </div>
+          )}
+        </section>
         )}
         {activeSection === "contact" && (
           <section id="contact" className={styles.contactSection}>

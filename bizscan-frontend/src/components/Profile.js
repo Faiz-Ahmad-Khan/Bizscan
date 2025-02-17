@@ -93,10 +93,15 @@ const Profile = () => {
     setServiceDescriptions(updatedServiceDescriptions);
   };
   const addService = () => {
-    setProfile({ ...profile, services: [...profile.services, {}] });
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      services: [...prevProfile.services, { imageUrl: "", description: "" }]
+    }));
+  
     setServiceFiles([...serviceFiles, null]);
     setServiceDescriptions([...serviceDescriptions, ""]);
   };
+  
   const deleteService = async (index) => {
     try {
       const response = await axios.delete(`http://localhost:8080/profile/${profile.id}/service/${index}`);
@@ -131,10 +136,15 @@ const Profile = () => {
     });
 
     serviceFiles.forEach((file, index) => {
-      if (file) formData.append("serviceImages", file);
-      formData.append("serviceDescriptions", serviceDescriptions[index] || "");
-    });
-
+      if (file) {
+        formData.append("serviceImages", file);
+      }
+    });    
+    
+    serviceDescriptions.forEach((desc) => {
+      formData.append("serviceDescriptions", desc);
+    });    
+    
     try {
       const response = await axios.put(
         `http://localhost:8080/profile/${profile.id}`,
@@ -205,7 +215,7 @@ const Profile = () => {
           </div>
         ))}
         <button type="button" className="carousel-button" onClick={addCarousel}>
-          {profile.carousels.length === 0 ? "Add an Image" : "Add Another Image"}
+          {(profile.carousels?.length || 0) === 0 ? "Add an Image" : "Add Another Image"}
         </button>
 
         <label>Services:</label>
@@ -227,7 +237,7 @@ const Profile = () => {
           </div>
         ))}
         <button type="button" className="service-button" onClick={addService}>
-          {profile.services.length === 0 ? "Add a Service" : "Add Another Service"}
+          {(profile.services?.length || 0) === 0 ? "Add a Service" : "Add Another Service"}
         </button>
 
         <div className="button-group">
